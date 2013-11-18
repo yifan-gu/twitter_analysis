@@ -1,0 +1,3 @@
+bin/hbase org.apache.hadoop.hbase.util.RegionSplitter tb2 -c 200 -f ut
+bin/hbase org.apache.hadoop.hbase.util.RegionSplitter tb3 -c 200 -f tw
+bin/hbase org.apache.hadoop.hbase.util.RegionSplitter tb4 -c 200 -f usr
