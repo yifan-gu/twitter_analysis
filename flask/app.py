@@ -757,13 +757,13 @@ class Flask(_PackageBoundObject):
         """
         from werkzeug.serving import run_simple
         if host is None:
-            host = '127.0.0.1'
+            host = '0.0.0.0'
         if port is None:
             server_name = self.config['SERVER_NAME']
             if server_name and ':' in server_name:
                 port = int(server_name.rsplit(':', 1)[1])
             else:
-                port = 5000
+                port = 80
         if debug is not None:
             self.debug = bool(debug)
         options.setdefault('use_reloader', self.debug)
