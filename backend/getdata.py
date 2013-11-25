@@ -52,7 +52,8 @@ class getdata():
 	    cols[decode(i[len('ut:'):])] = result[0].columns[i].value	
 	for i in sorted(cols.keys()):
 	    #print repr(cols[i].decode('utf-8'))[2:]
-	    tw.append(str(i)+':'+ repr(cols[i].decode('utf-8'))[2:-1].replace('\\\'', '\''))
+	    tw.append(str(i)+':'+ json.dumps(cols[i].decode('utf-8'))[1:-1].replace('/', '\\/'))
+	    #tw.append(str(i)+':'+ repr(cols[i].decode('utf-8'))[2:-1].replace('\\\'', '\''))
         return tw
 
     def query3(self, startId, endId):
