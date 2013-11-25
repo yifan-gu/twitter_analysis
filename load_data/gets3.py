@@ -3,7 +3,7 @@
 import subprocess
 
 d = open('./jsonlist.txt', 'w')
-with open("./s3_jsonlist.txt", "r") as f:
+with open("./rawlist.txt", "r") as f:
     for s3_path in f:
         subprocess.check_call(
         "s3cmd get {0}".format(s3_path.split()[-1]),
