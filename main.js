@@ -4,9 +4,13 @@ var async = require('async');
 var mysql = require('mysql');
 var NodeCache = require('node-cache');
 var cache = new NodeCache( { stdTTL: 1, checkperiod: 0 } );
-require("date-format-lite")
-Date.masks.default = 'YYYY-MM-DD+hh:mm:ss'
+require("date-format-lite");
+Date.masks.default = 'YYYY-MM-DD+hh:mm:ss';
 var teamstr = "supercloud, niubi\n";
+
+var redis = require("redis");
+
+client = redis.createClient();
 
 //var express = require('express');
 //var app = express();
@@ -86,15 +90,27 @@ async.series({
           parseInt(myArray[6])
         ) / 1000;
 
-        res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.write("q2, time: " + timestamp);
+        //console.log(timestamp);
+        client.get(timestamp, function (err, data) {
+          res.writeHead(200, {'Content-Type': 'text/plain'});
+          if(err){
+            res.end(teamstr + 'Nothing found');
+          }
+          else{
+            if(!data){
+              res.end(teamstr + 'Nothing found');
+            }else{
+              res.end(teamstr + data + '\n');
+            }
+          }
+        });
       }
       else if(qqq == "/q3"){
         var i = req.url.indexOf('max');
         var uid_min = req.url.substring(15, i - 8);
         var uid_max = req.url.substring(i+4);
         res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.write("q3, userid_min: " + uid_min + ", userid_max: " + uid_max);
+        res.end("q3, userid_min: " + uid_min + ", userid_max: " + uid_max);
       }
       else if(qqq == "/q4"){
         var uid= req.url.substring(11);
@@ -108,8 +124,8 @@ async.series({
         }
       }
 
-      res.end();
     }).listen(80);
+    //}).listen(3000);
 
     console.log("start listening on port 80");
     //}
