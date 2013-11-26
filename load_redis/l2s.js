@@ -32,25 +32,19 @@ client.keys("*", function (err, keys) {
 
       value = arr.join('\n');
 
-      client.del(key, function (err) {
+      client.set(key, value, function (err) {
         if(err){
           console.log(err);
           return;
         }
-        client.set(key, value, function (err) {
-          if(err){
-            console.log(err);
-            return;
-          }
-          counter = counter + 1;
-          if(counter == total){
-            console.log("finished");
-            client.quit(function (err, res) {
-                console.log("Exiting from quit command.");
-            });
-          }
-        });
-      })
+        counter = counter + 1;
+        if(counter == total){
+          console.log("finished!");
+          client.quit(function (err, res) {
+              console.log("Exiting from quit command.");
+          });
+        }
+      });
 
     });
 

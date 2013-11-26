@@ -31,6 +31,8 @@ async.series({
       if (err) {
         console.log(err);
       }
+      //callback(null, 1);
+
     });
     
     conn.query('select * from tb4', function(err, rows) {
@@ -42,7 +44,7 @@ async.series({
           console.log('line ' + i);
         }
       });
-  
+    
       console.log('tb4 load done');
       callback(null, 1);
     });
@@ -107,10 +109,21 @@ async.series({
       }
       else if(qqq == "/q3"){
         var i = req.url.indexOf('max');
-        var uid_min = req.url.substring(15, i - 8);
+        var uid_min = req.url.substring(14, i - 8);
         var uid_max = req.url.substring(i+4);
-        res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.end("q3, userid_min: " + uid_min + ", userid_max: " + uid_max);
+        conn.query('select count from tb3 where id < ' + uid_min + ' order by id desc limit 1', function(err, rows){
+          if (!rows) {
+            min_cnt = 0;
+          }
+
+          min_cnt = rows[0]['count'];
+          conn.query('select count from tb3 where id >= ' + uid_max + ' limit 1', function(err, rows){
+            // TODO out of bound
+            var max_cnt = rows[0]['count'];
+            res.writeHead(200, {'Content-Type': 'text/plain'});
+            res.end(teamstr + (max_cnt - min_cnt) + '\n');
+          });
+        });
       }
       else if(qqq == "/q4"){
         var uid= req.url.substring(11);
@@ -123,7 +136,7 @@ async.series({
           res.end(teamstr);
         }
       }
-
+      
     }).listen(80);
     //}).listen(3000);
 
