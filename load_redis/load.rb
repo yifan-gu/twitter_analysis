@@ -10,9 +10,11 @@ def gen_redis_proto(*cmd)
     proto
 end
 
-file = File.new("out", "r")
-while (line = file.gets)
-  data = line.chomp("\n").split(' ', 2)
-  STDOUT.write(gen_redis_proto("LPUSH", data[0], data[1]))
+ARGV.each do |filename|
+  file = File.new(filename, "r")
+  while (line = file.gets)
+    data = line.chomp("\n").split(' ', 2)
+    STDOUT.write(gen_redis_proto("LPUSH", data[0], data[1]))
+  end
+  file.close
 end
-file.close

@@ -18,7 +18,7 @@ client.keys("*", function (err, keys) {
         console.log(err);
         return;
       }
-      arr = []
+      var arr = []
       for (var i=0; i < data.length; ++i) {
         arr.push(data[i].split(':', 2))
       }
@@ -30,7 +30,7 @@ client.keys("*", function (err, keys) {
         arr[i] = arr[i][0] + ':' + arr[i][1]
       }
 
-      value = arr.join('\n');
+      var value = arr.join('\n');
 
       client.set(key, value, function (err) {
         if(err){

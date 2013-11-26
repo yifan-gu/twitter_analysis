@@ -9,7 +9,7 @@ def s3_get(s3_path):
             shell=True
         )
     subprocess.check_call(
-            "./red_load.sh"
+            "./merge.sh"
         )
 
 with open('jsonlist.txt', 'r') as f:

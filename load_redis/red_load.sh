@@ -1,4 +1,3 @@
 #!/bin/sh
 
-./merge.sh
-./load.rb | redis-cli --pipe
+./load.rb $(ls out*) | redis-cli --pipe
