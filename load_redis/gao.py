@@ -1,0 +1,29 @@
+#!/usr/bin/env python
+
+import json
+
+# objective
+#   created_at: timestamp
+#   tweet id:
+#   text:
+
+
+def chaogao(tweet_json):
+    #print tweet_json
+    tweet = json.loads(tweet_json)
+    #text  = (repr(tweet['text']))
+    #if(text[0] == 'u'):
+        #text = text[2:-1]
+    #text = text.replace('/','\\/')
+    i = tweet_json.find("text") + 7
+    j = tweet_json.find("\"", i)
+    text = tweet_json[i:j]
+    print "{}:{}".format(tweet['id'], text)
+    #print ""
+
+def gao(f):
+    for line in f:
+        if line.strip() != "":
+            chaogao(line.rstrip())
+
+gao(open('small.json', "r"))
