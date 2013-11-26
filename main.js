@@ -1,25 +1,46 @@
-var express = require('express');
-var app = express();
+var http = require('http');
 
-app.get('/q1', function (req, res) {
-  res.send('supercloud q1!');
-});
+http.createServer(function (req, res) {
+  //var body = "hello, world";
+  //res.writeHead(200, {'Content-Type': 'text/plain', 'Content-Length': body.length});
+  //res.write("hello, world");
+  qqq = req.url.substring(0, 3);
 
-app.get('/q2', function (req, res) {
-  var create_time = req.param('time');
-  res.send('supercloud q2 = time: ' + create_time + '!');
-});
+  if(qqq == "/q1"){
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.write("q1");
+  }
+  else if(qqq == "/q2"){
+    var create_time = req.url.substring(9);
+    var pattern = /(\d{4})-(\d{2})-(\d{2})\+(\d{2}):(\d{2}):(\d{2})/;
+    var myArray = pattern.exec(create_time);
+    var timestamp = Date.UTC(
+                      parseInt(myArray[1]),
+                      parseInt(myArray[2]) - 1,
+                      parseInt(myArray[3]),
+                      parseInt(myArray[4]),
+                      parseInt(myArray[5]),
+                      parseInt(myArray[6])
+                   ) / 1000;
 
-app.get('/q3', function (req, res) {
-  var uid_min = req.param('userid_min');
-  var uid_max = req.param('userid_max');
-  res.send('supercloud q3 = userid_min: ' + uid_min + ', userid_max: ' + uid_max + '!');
-});
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.write("q2, time: " + timestamp);
+  }
+  else if(qqq == "/q3"){
 
-app.get('/q4', function (req, res) {
-  var userid = req.param('userid');
-  res.send('supercloud q4 = userid: '+ userid + '!');
-});
+    var i = req.url.indexOf('max');
+    var uid_min = req.url.substring(15, i - 8);
+    var uid_max = req.url.substring(i+4);
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.write("q3, userid_min: " + uid_min + ", userid_max: " + uid_max);
+  }
+  else if(qqq == "/q4"){
+    var uid= req.url.substring(11);
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.write("q4, userid: " + uid);
+  }
 
-app.listen(3000);
-console.log('Listening on port 3000');
+  res.end();
+}).listen(3000);
+
+console.log("start listening on port 3000");
