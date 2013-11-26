@@ -96,6 +96,8 @@ async.series({
         var uid_min = req.url.substring(15, i - 8);
         var uid_max = req.url.substring(i+4);
         var min_cnt;
+        var max_cnt
+
         //console.log(uid_min);
         //console.log(uid_max);
         conn.query('select count from tb3 where id < ' + uid_min + ' order by id desc limit 1', function(err, rows){
@@ -106,10 +108,9 @@ async.series({
           }
           
           conn.query('select count from tb3 where id <= ' + uid_max + ' order by id desc limit 1', function(err, rows){
-            var max_cnt
             // TODO out of bound
             if (!rows) {
-              min_cnt = 0;
+              max_cnt = 0;
             }  else {
               max_cnt = rows[0]['count'];
             }
