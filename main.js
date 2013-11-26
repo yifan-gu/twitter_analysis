@@ -93,17 +93,29 @@ async.series({
       }
       else if(qqq == "/q3"){
         var i = req.url.indexOf('max');
-        var uid_min = req.url.substring(14, i - 8);
+        var uid_min = req.url.substring(15, i - 8);
         var uid_max = req.url.substring(i+4);
+        var min_cnt;
+        //console.log(uid_min);
+        //console.log(uid_max);
         conn.query('select count from tb3 where id < ' + uid_min + ' order by id desc limit 1', function(err, rows){
           if (!rows) {
             min_cnt = 0;
+          } else {
+            min_cnt = rows[0]['count'];
           }
-
-          min_cnt = rows[0]['count'];
+          
           conn.query('select count from tb3 where id <= ' + uid_max + ' order by id desc limit 1', function(err, rows){
+            var max_cnt
             // TODO out of bound
-            var max_cnt = rows[0]['count'];
+            if (!rows) {
+              min_cnt = 0;
+            }  else {
+              max_cnt = rows[0]['count'];
+            }
+            //console.log(min_cnt);
+            //console.log(max_cnt);
+            
             res.writeHead(200, {'Content-Type': 'text/plain'});
             res.end(teamstr + (max_cnt - min_cnt) + '\n');
           });
