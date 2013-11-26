@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import json
+import re
 
 # objective
 #   created_at: timestamp
@@ -15,8 +16,10 @@ def chaogao(tweet_json):
     #if(text[0] == 'u'):
         #text = text[2:-1]
     #text = text.replace('/','\\/')
-    i = tweet_json.find("text") + 7
-    j = tweet_json.find("\"", i)
+    i = tweet_json.find("text\":\"") + 7
+    pattern = re.compile(r'[^\\]"')
+    m = pattern.search(tweet_json, i)
+    j = m.end()-1
     text = tweet_json[i:j]
     print "{}:{}".format(tweet['id'], text)
     #print ""
