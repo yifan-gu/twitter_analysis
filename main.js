@@ -8,7 +8,7 @@ http.createServer(function (req, res) {
 
   if(qqq == "/q1"){
     res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.write("q1");
+    res.end("q1");
   }
   else if(qqq == "/q2"){
     var create_time = req.url.substring(9);
