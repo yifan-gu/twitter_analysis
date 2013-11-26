@@ -101,7 +101,7 @@ async.series({
           }
 
           min_cnt = rows[0]['count'];
-          conn.query('select count from tb3 where id >= ' + uid_max + ' limit 1', function(err, rows){
+          conn.query('select count from tb3 where id <= ' + uid_max + ' order by id desc limit 1', function(err, rows){
             // TODO out of bound
             var max_cnt = rows[0]['count'];
             res.writeHead(200, {'Content-Type': 'text/plain'});
