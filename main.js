@@ -1,5 +1,5 @@
 var http = require('http');
-//var cluster = require('cluster');
+var cluster = require('cluster');
 var async = require('async');
 var mysql = require('mysql');
 var NodeCache = require('node-cache');
@@ -46,11 +46,11 @@ async.series({
   },
 
   create_server: function(callback) {
-    /*if (cluster.isMaster) {
+    if (cluster.isMaster) {
       for (var i = 0; i < 0; i++) {
       cluster.fork();
       }
-      } else {*/
+    } else {
     http.createServer(function (req, res) {
       try{
         //var body = "hello, world";
@@ -172,7 +172,7 @@ async.series({
     //}).listen(3000);
 
     console.log("start listening on port 80");
-    //}
+    }
     callback(null, 2);
   },
 });
