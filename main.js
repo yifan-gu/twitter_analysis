@@ -33,12 +33,12 @@ async.series({
         var i = 0;
         rows.forEach(function(row) {
           map[row['id']] = row['users'];
-          
+
           if (++i % 100000 == 0) {
             console.log('line ' + i);
           }
         });
-        
+
         console.log('tb4 load done');
         callback(null, 1);
       });
@@ -52,101 +52,119 @@ async.series({
       }
       } else {*/
     http.createServer(function (req, res) {
-      //var body = "hello, world";
-      //res.writeHead(200, {'Content-Type': 'text/plain', 'Content-Length': body.length});
-      //res.write("hello, world");
-      qqq = req.url.substring(0, 3);
+      try{
+        //var body = "hello, world";
+        //res.writeHead(200, {'Content-Type': 'text/plain', 'Content-Length': body.length});
+        //res.write("hello, world");
+        qqq = req.url.substring(0, 3);
 
-      if(qqq == "/q1"){
-        cache.get("time", function(err, kv) {
-          //console.log(kv);
-          var datestr;
-          if (Object.keys(kv).length == 0) {
-            var now = new Date();
-            datestr = now.format();
-            cache.set("time", datestr);
-          } else {
-            datestr = kv["time"]
-          }
-          
-          res.writeHead(200, {'Content-Type': 'text/plain'});
-          res.end(teamstr + datestr + '\n');
-        });
-        
-      }
-      else if(qqq == "/q2"){
-        var create_time = req.url.substring(9);
-        var pattern = /(\d{4})-(\d{2})-(\d{2})\+(\d{2}):(\d{2}):(\d{2})/;
-        var myArray = pattern.exec(create_time);
-        var timestamp = Date.UTC(
-          parseInt(myArray[1]),
-          parseInt(myArray[2]) - 1,
-          parseInt(myArray[3]),
-          parseInt(myArray[4]),
-          parseInt(myArray[5]),
-          parseInt(myArray[6])
-        ) / 1000;
-
-        //console.log(timestamp);
-        client.get(timestamp, function (err, data) {
-          res.writeHead(200, {'Content-Type': 'text/plain'});
-          if(err){
-            res.end(teamstr + 'Nothing found');
-          }
-          else{
-            if(!data){
-              res.end(teamstr + 'Nothing found');
-            }else{
-              res.end(teamstr + data + '\n');
-            }
-          }
-        });
-      }
-      else if(qqq == "/q3"){
-        var i = req.url.indexOf('max');
-        var uid_min = req.url.substring(15, i - 8);
-        var uid_max = req.url.substring(i+4);
-        var min_cnt;
-        var max_cnt
-
-        //console.log(uid_min);
-        //console.log(uid_max);
-        pool.getConnection(function(err, conn) {
-          conn.query('select count from tb3 where id < ' + uid_min + ' order by id desc limit 1', function(err, rows){
-            if (!rows) {
-              min_cnt = 0;
+        if(qqq == "/q1"){
+          cache.get("time", function(err, kv) {
+            //console.log(kv);
+            var datestr;
+            if (Object.keys(kv).length == 0) {
+              var now = new Date();
+              datestr = now.format();
+              cache.set("time", datestr);
             } else {
-              min_cnt = rows[0]['count'];
+              datestr = kv["time"]
             }
-            
-            conn.query('select count from tb3 where id <= ' + uid_max + ' order by id desc limit 1', function(err, rows){
-              // TODO out of bound
-              if (!rows) {
-                max_cnt = 0;
-              }  else {
-                max_cnt = rows[0]['count'];
+
+            res.writeHead(200, {'Content-Type': 'text/plain'});
+            res.end(teamstr + datestr + '\n');
+          });
+
+        }
+        else if(qqq == "/q2"){
+          var create_time = req.url.substring(9);
+          var pattern = /(\d{4})-(\d{2})-(\d{2})\+(\d{2}):(\d{2}):(\d{2})/;
+          var myArray = pattern.exec(create_time);
+          var timestamp = Date.UTC(
+            parseInt(myArray[1]),
+            parseInt(myArray[2]) - 1,
+            parseInt(myArray[3]),
+            parseInt(myArray[4]),
+            parseInt(myArray[5]),
+            parseInt(myArray[6])
+          ) / 1000;
+
+          //console.log(timestamp);
+          client.lrange(timestamp, 0, -1, function (err, data) {
+            res.writeHead(200, {'Content-Type': 'text/plain'});
+            if(err){
+              res.end(teamstr + 'Nothing found');
+            }
+            else{
+              if(!data.length){
+                res.end(teamstr + 'Nothing found');
+              }else{
+                var arr = []
+                for (var i=0; i < data.length; ++i) {
+                  arr.push(data[i].split(':', 2))
+                }
+                arr.sort(function (a, b) {
+                  return a[0] - b[0];
+                });
+
+                for (var i=0; i < arr.length; ++i) {
+                  arr[i] = arr[i][0] + ':' + arr[i][1]
+                }
+
+                var value = arr.join('\n');
+                res.end(teamstr + value + '\n');
               }
-              //console.log(min_cnt);
-              //console.log(max_cnt);
-              conn.release();
-              res.writeHead(200, {'Content-Type': 'text/plain'});
-              res.end(teamstr + (max_cnt - min_cnt) + '\n');
+            }
+          });
+        }
+        else if(qqq == "/q3"){
+          var i = req.url.indexOf('max');
+          var uid_min = req.url.substring(15, i - 8);
+          var uid_max = req.url.substring(i+4);
+          var min_cnt;
+          var max_cnt
+
+          //console.log(uid_min);
+          //console.log(uid_max);
+          pool.getConnection(function(err, conn) {
+            conn.query('select count from tb3 where id < ' + uid_min + ' order by id desc limit 1', function(err, rows){
+              if (!rows) {
+                min_cnt = 0;
+              } else {
+                min_cnt = rows[0]['count'];
+              }
+
+              conn.query('select count from tb3 where id <= ' + uid_max + ' order by id desc limit 1', function(err, rows){
+                // TODO out of bound
+                if (!rows) {
+                  max_cnt = 0;
+                }  else {
+                  max_cnt = rows[0]['count'];
+                }
+                //console.log(min_cnt);
+                //console.log(max_cnt);
+                conn.release();
+                res.writeHead(200, {'Content-Type': 'text/plain'});
+                res.end(teamstr + (max_cnt - min_cnt) + '\n');
+              });
             });
           });
-        });
-      }
-      else if(qqq == "/q4"){
-        var uid= req.url.substring(11);
-        res.writeHead(200, {'Content-Type': 'text/plain'});
-        data = map[uid];
-        //console.log(data);
-        if (data) {
-          res.end(teamstr + data);
-        } else {
-          res.end(teamstr);
         }
+        else if(qqq == "/q4"){
+          var uid= req.url.substring(11);
+          res.writeHead(200, {'Content-Type': 'text/plain'});
+          data = map[uid];
+          //console.log(data);
+          if (data) {
+            res.end(teamstr + data);
+          } else {
+            res.end(teamstr);
+          }
+        }
+      } catch(e){
+        console.log(e);
+        res.writeHead(200, {'Content-Type': 'text/plain'});
+        res.end(teamstr);
       }
-      
     }).listen(80);
     //}).listen(3000);
 
