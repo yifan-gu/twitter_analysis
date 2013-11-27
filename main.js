@@ -1,5 +1,5 @@
 var http = require('http');
-var cluster = require('cluster');
+//var cluster = require('cluster');
 var async = require('async');
 var mysql = require('mysql');
 var NodeCache = require('node-cache');
