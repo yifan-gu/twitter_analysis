@@ -98,20 +98,22 @@ async.series({
               if(!data.length){
                 res.end(teamstr + 'Nothing found');
               }else{
-                var arr = new Array(data.length);
-                var str = new Array(data.length);
-                for (var i=0; i < data.length; ++i) {
-                  arr[i] = (data[i].split(':', 2))
-                }
-                arr.sort(function (a, b) {
-                  return a[0] - b[0];
+                //var arr = new Array(data.length);
+                //var str = new Array(data.length);
+                //for (var i=0; i < data.length; ++i) {
+                  //arr[i] = (data[i].split(':', 2))
+                //}
+                data.sort(function (a, b) {
+                  return a.split(':')[0] - b.split(':')[0];
                 });
 
-                for (var i=0; i < arr.length; ++i) {
-                  str[i] = arr[i][0] + ':' + arr[i][1]
-                }
 
-                var value = str.join('\n');
+                //for (var i=0; i < arr.length; ++i) {
+                  //str[i] = arr[i][0] + ':' + arr[i][1]
+                //}
+
+                //var value = str.join('\n');
+                var value = data.join('\n');
                 res.end(teamstr + value + '\n');
               }
             }
