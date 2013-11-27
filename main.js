@@ -6,7 +6,7 @@ var NodeCache = require('node-cache');
 var cache = new NodeCache( { stdTTL: 1, checkperiod: 0 } );
 require("date-format-lite");
 Date.masks.default = 'YYYY-MM-DD+hh:mm:ss';
-var teamstr = "supercloud, niubi\n";
+var teamstr = "supercloud,5830-2688-4282\n";
 
 var redis = require("redis");
 
