@@ -17,32 +17,27 @@ var conn;
 
 async.series({
   loadtb4: function(callback) {
-    conn = mysql.createConnection({
+    pool = mysql.createPool({
       host : 'localhost',
       user : 'root',
       database : 'cloud',
+      connectionLimit: 10,
     });
-    
-    conn.connect(function(err) {
-      if (err) {
-        console.log(err);
-      }
-      //callback(null, 1);
 
-    });
-    
-    conn.query('select * from tb4', function(err, rows) {
-      var i = 0;
-      rows.forEach(function(row) {
-        map[row['id']] = row['users'];
+    pool.getConnection(function(err, conn) {
+      conn.query('select * from tb4', function(err, rows) {
+        var i = 0;
+        rows.forEach(function(row) {
+          map[row['id']] = row['users'];
+          
+          if (++i % 100000 == 0) {
+            console.log('line ' + i);
+          }
+        });
         
-        if (++i % 100000 == 0) {
-          console.log('line ' + i);
-        }
+        console.log('tb4 load done');
+        callback(null, 1);
       });
-    
-      console.log('tb4 load done');
-      callback(null, 1);
     });
   },
 
@@ -100,25 +95,27 @@ async.series({
 
         //console.log(uid_min);
         //console.log(uid_max);
-        conn.query('select count from tb3 where id < ' + uid_min + ' order by id desc limit 1', function(err, rows){
-          if (!rows) {
-            min_cnt = 0;
-          } else {
-            min_cnt = rows[0]['count'];
-          }
-          
-          conn.query('select count from tb3 where id <= ' + uid_max + ' order by id desc limit 1', function(err, rows){
-            // TODO out of bound
+        pool.getConnection(function(err, conn) {
+          conn.query('select count from tb3 where id < ' + uid_min + ' order by id desc limit 1', function(err, rows){
             if (!rows) {
-              max_cnt = 0;
-            }  else {
-              max_cnt = rows[0]['count'];
+              min_cnt = 0;
+            } else {
+              min_cnt = rows[0]['count'];
             }
-            //console.log(min_cnt);
-            //console.log(max_cnt);
             
-            res.writeHead(200, {'Content-Type': 'text/plain'});
-            res.end(teamstr + (max_cnt - min_cnt) + '\n');
+            conn.query('select count from tb3 where id <= ' + uid_max + ' order by id desc limit 1', function(err, rows){
+              // TODO out of bound
+              if (!rows) {
+                max_cnt = 0;
+              }  else {
+                max_cnt = rows[0]['count'];
+              }
+              //console.log(min_cnt);
+              //console.log(max_cnt);
+              conn.release();
+              res.writeHead(200, {'Content-Type': 'text/plain'});
+              res.end(teamstr + (max_cnt - min_cnt) + '\n');
+            });
           });
         });
       }
