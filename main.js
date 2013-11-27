@@ -98,19 +98,20 @@ async.series({
               if(!data.length){
                 res.end(teamstr + 'Nothing found');
               }else{
-                var arr = []
+                var arr = new Array(data.length);
+                var str = new Array(data.length);
                 for (var i=0; i < data.length; ++i) {
-                  arr.push(data[i].split(':', 2))
+                  arr[i] = (data[i].split(':', 2))
                 }
                 arr.sort(function (a, b) {
                   return a[0] - b[0];
                 });
 
                 for (var i=0; i < arr.length; ++i) {
-                  arr[i] = arr[i][0] + ':' + arr[i][1]
+                  str[i] = arr[i][0] + ':' + arr[i][1]
                 }
 
-                var value = arr.join('\n');
+                var value = str.join('\n');
                 res.end(teamstr + value + '\n');
               }
             }
